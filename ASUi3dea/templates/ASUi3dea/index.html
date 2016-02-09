@@ -1,0 +1,9 @@
+{% if inverter_list %}
+    <ul>
+    {% for inverter in inverter_list %}
+        <li><a href="{% url 'ASUi3dea:detail' inverter.id %}">{{ inverter.id }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No inverters are available.</p>
+{% endif %}
