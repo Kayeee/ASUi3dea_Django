@@ -21,5 +21,4 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ASUi3dea/', include('ASUi3dea.urls', namespace="ASUi3dea"))
-
 ]

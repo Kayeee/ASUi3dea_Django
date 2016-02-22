@@ -9,9 +9,12 @@ class Inverter(models.Model):
     state = models.BooleanField(default = False)
     temp = models.FloatField(default = 0)
     on_time = models.IntegerField(default = 0)
+    latitude = models.FloatField(default = 33.3059398)
+    longitude = models.FloatField(default = -111.6792469)
 
     def is_on(self):
         return state
+
 
 
 @python_2_unicode_compatible

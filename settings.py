@@ -28,6 +28,7 @@ SECRET_KEY = '2i35v9hgjxvkwzobkvo7kg$qwulavkay&g&n==1rui9l8sa0xk'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+LOGIN_URL = '/ASUi3dea/login/'
 ALLOWED_HOSTS = ['.localhost']
 
 ADMINS = (
@@ -109,11 +110,9 @@ USE_TZ = True
 DATE_FORMAT = "Y-m-d"
 
 SESSION_COOKIE_SECURE = False
-MEDIA_ROOT = '/Users/kevin/Documents/i3dea/Django/static'
 
-MEDIA_URL = 'http://127.0.0.1/'
+STATIC_ROOT = ''
 
-STATIC_ROOT = 'http://127.0.0.1/static/'
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATIC_URL = os.path.join(os.path.dirname(__file__), '/static/admin/')
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = ( os.path.join('static'), )
