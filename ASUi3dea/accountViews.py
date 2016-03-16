@@ -23,6 +23,13 @@ def auth_view(request):
     user = auth.authenticate(username = username, password = password)
     if user is not None:
         auth.login(request, user)
-        return HttpResponseRedirect('/ASUi3dea/authUser')
+        if user.groups.filter(name='Controller').exists():
+            return HttpResponseRedirect('/ASUi3dea/authUser')
+        if user.groups.filter(name='User').exists():
+            #TODO: This MUST BE CHANGED FROM 'authUser' to 'basicUser'.
+            return HttpResponseRedirect('/ASUi3dea/authUser')
     else:
         return HttpResponseRedirect('/ASUi3dea/invalid')
+
+def is_controller(user):
+    return user.groups.filter(name='Controller').exists()

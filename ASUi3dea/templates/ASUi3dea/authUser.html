@@ -6,11 +6,11 @@
 
 {% endblock %}
 
-<!-- Inverter List -->
+<!-- pi List -->
 {% load staticfiles %}
 <header>
   <script>
-    var inverter_list = {{inverter_list_json|safe}};
+    var pi_list = {{pi_list_json|safe}};
   </script>
 </header>
 
@@ -29,24 +29,23 @@
 
  <style>
   #map { height: 600px; width: 600px; display: inline-block;}
-  .controls { display: inline-block; height: 29px;}
+  .listContainer { display: inline-block; height: 29px;}
  </style>
 </head>
 <body>
   <div id="mapControlContainer">
     <div id="map"></div>
-    <div class="controls">
+    <div class="listContainer">
+      <ul id="inverters">
+      </ul>
 
+<!--
       <form id="controlFrm" action="/ASUi3dea/save_controls/" method="POST">{% csrf_token %}
         <div><span>ID: </span><span id="pk"></span></div>
         <input type="checkbox" name="on_off" value="True" id="on_off">
         <input type="submit" value="Save"/>
       </form>
-
-      <div><span>Temp: </span><span id="temp"></span></div>
-      <div><span>Latitude: </span><span id="lat"></span></div>
-      <div><span>Longitude: </span><span id="lng"></span></div>
-      <div><span>On Time: </span><span id="time"></span></div>
+-->
     </div>
  </div>
 

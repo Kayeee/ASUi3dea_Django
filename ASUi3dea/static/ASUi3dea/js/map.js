@@ -13,20 +13,16 @@ $(document).ready(function() {
     accessToken: 'pk.eyJ1Ijoia2V2ZXJseSIsImEiOiJjaWtrY3J4MXgwYXlndWRtNmFvbjhjM252In0.QWdPrZOYKI9dd4KB6CHhDw'
   }).addTo(map);
 
-  for (inverter of inverter_list){
-    var marker = L.marker([inverter.fields.latitude, inverter.fields.longitude]).addTo(map);
-    marker.bindPopup("<b>"+ inverter.pk+"\n</b><b>Temp: "+inverter.fields.temp+"\n</b>");
+  for (pi of pi_list){
+    var marker = L.marker([pi.fields.latitude, pi.fields.longitude]).addTo(map);
     marker.on('click', function(e) {
       selectedMarker = this.getLatLng()
 
-      $.getJSON('/ASUi3dea/get_inverter_data', {lat: selectedMarker.lat, lng: selectedMarker.lng}, function(data, jqXHR){
-          selectedMarker['pk'] = data[0].pk
-          $('#pk').text(data[0].pk)
-          $('#temp').text(data[0].fields.temp)
-          $('#lat').text(data[0].fields.latitude)
-          $('#lng').text(data[0].fields.longitude)
-          $('#time').text(data[0].fields.on_time)
-          $('[name="on_off"]').bootstrapSwitch('state', data[0].fields.state)
+      $.getJSON('/ASUi3dea/get_pi_data', {lat: selectedMarker.lat, lng: selectedMarker.lng}, function(data, jqXHR){
+        $("#inverters").empty()
+        for(inverter of data){
+          $("#inverters").append('<li><a href="/ASUi3dea/'+inverter.pk+'"><span>'+inverter.pk+'</span></a></li>')
+        }
       });
     });
   };

@@ -1,6 +1,88 @@
-<h1>{{ inverter.id }}</h1>
-<ul>
-<div>{{ inverter.state }}</div>
-<div>{{ inverter.temp }}</div>
-<div>{{ inverter.on_time }}</div>
-</ul>
+<h1>{{ inverter.pk }}</h1>
+{% load staticfiles %}
+<head>
+  <script src="{% static "ASUi3dea/js/jquery-1.12.0.js" %}"/></script>
+  <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="{% static "ASUi3dea/js/graph.js" %}"/></script>
+  <script>
+    var inverter = "{{inverter}}";
+  </script>
+</head>
+<body>
+<style>
+
+body {
+font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+fill: none;
+stroke: #000;
+shape-rendering: crispEdges;
+}
+
+.x.axis path {
+display: none;
+}
+
+.line {
+fill: none;
+stroke: steelblue;
+stroke-width: 1.5px;
+}
+
+</style>
+  <ul> <h2>Current:</h2>
+    {% for link in links %}
+      <li>{{link}}</li>
+    {% endfor %}
+    {% for attribute in attributes %}
+        {% url 'ASUi3dea:get_inverter_data' inverter_pk=inverter.pk data_set=attribute.0 as the_url %}
+        <li><button id="{{attribute.0}}"> {{ attribute.1.generic_name }}: {{attribute.1.get_data.1}}</button></li>
+        <script>
+        $("#{{attribute.0}}").click(function() {
+            d3.json("{{the_url}}", function(error, data) {
+              window.alert(data)
+              draw_line_graph(data);
+
+            });
+          });
+        </script>
+    {% endfor %}
+  </ul>
+  <script>
+
+              var margin = {top: 20, right: 20, bottom: 30, left: 50},
+                width = 960 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+
+              var parseDate = d3.time.format("%Y-%m-%d").parse; // for dates like "2014-01-01"
+              //var parseDate = d3.time.format("%Y-%m-%dT00:00:00Z").parse;  // for dates like "2014-01-01T00:00:00Z"
+
+              var x = d3.time.scale()
+                .range([0, width]);
+
+              var y = d3.scale.linear()
+                .range([height, 0]);
+
+              var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom");
+
+              var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left");
+
+              var line = d3.svg.line()
+                .x(function(d) { return x(d.timeStamp); })
+                .y(function(d) { return y(d.data_value); });
+
+              var svg = d3.select("body").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  </script>
+</body>
