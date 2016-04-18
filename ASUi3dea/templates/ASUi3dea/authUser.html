@@ -1,56 +1,59 @@
 <html>
-{% block content %}
-
-<h2> Hi {{full_name}}, you are logged in! </h2>
-<p> Click <a href="/ASUi3dea/logout/">here</a> to logout. </p>
-
-{% endblock %}
-
 <!-- pi List -->
 {% load staticfiles %}
-<header>
-  <script>
-    var pi_list = {{pi_list_json|safe}};
-  </script>
-</header>
-
 <head>
+  <script>
+    var pi_list = {{pi_list_json|safe}}; //json so doesn't need quotes
+    var available_models = {{available_models|safe}};
+  </script>
+
  <script src="{% static "ASUi3dea/js/jquery-1.12.0.js" %}"/></script>
+ <script src="{% static "ASUi3dea/js/us-states.js" %}"/></script>
 
  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
  <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
  <script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
  <link href='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.css' rel='stylesheet' />
 
- <link href="{% static "ASUi3dea/css/bootstrap.css" %}" rel="stylesheet"/>
- <link href="{% static "ASUi3dea/css/bootstrap-switch.css" %}" rel="stylesheet"/>
- <script src="{% static "ASUi3dea/js/bootstrap-switch.js" %}"/></script>
-
-
- <style>
-  #map { height: 600px; width: 600px; display: inline-block;}
-  .listContainer { display: inline-block; height: 29px;}
- </style>
+ <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+ <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+ <link href="{% static "ASUi3dea/css/authUser.css" %}" rel="stylesheet"/></script>
 </head>
+
 <body>
-  <div id="mapControlContainer">
-    <div id="map"></div>
-    <div class="listContainer">
-      <ul id="inverters">
-      </ul>
+  <header>
+    <span>
+      <h2 style="display: inline-block; margin: 5px;"> Hi {{full_name}}, you are logged in! </h2>
+      <p style="float: right; display: inline-block;"> Click <a href="/ASUi3dea/logout/">here</a> to logout. </p>
+    </span>
+  </header>
 
 <!--
+  <div class="dropdown" style="margin-bottom: 10px; margin-left: 40px;">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" >None
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu" id="data-types-dropdown">
+    </ul>
+  </div>
+-->
+
+  <div id="maplist">
+    <div id="map"></div>
+    <div class="listContainer">
+      <div class="list-group", id="inverters"></div>
+    </div>
+  </div>
+
+ <script src="{% static "ASUi3dea/js/map.js" %}"></script>
+</body>
+<script>
+ var stateValues = {{stateValues|safe}};
+</script>
+</html>
+<!-- Sample From
       <form id="controlFrm" action="/ASUi3dea/save_controls/" method="POST">{% csrf_token %}
         <div><span>ID: </span><span id="pk"></span></div>
         <input type="checkbox" name="on_off" value="True" id="on_off">
         <input type="submit" value="Save"/>
       </form>
 -->
-    </div>
- </div>
-
- <script src="{% static "ASUi3dea/js/map.js" %}"></script>
-
-</body>
-
-</html>

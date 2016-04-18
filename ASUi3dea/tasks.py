@@ -1,7 +1,7 @@
 from celery import Celery
 
 app = Celery('tasks', backend='amqp',
-                      broker='amqp://Prafulla:praf1249@10.143.218.17:5672/py_env')
+                      broker='amqp://Prafulla:praf1249@10.143.219.75:5672/py_env')
 
 @app.task
 def add(mode):
@@ -28,7 +28,7 @@ def adjust_wattage(new_wattage):
     return success
 
 @app.task
-def pull_data():
+def pull_data(inverter_pk):
     return data
 
 @app.task
@@ -46,3 +46,7 @@ def set_max_voltage():
 @app.task
 def set_min_voltage():
     return success
+
+@app.task
+def sanity_test():
+    return data

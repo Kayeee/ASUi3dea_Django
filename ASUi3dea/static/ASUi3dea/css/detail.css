@@ -1,0 +1,61 @@
+
+header{
+  width: 100%;
+  background-color: black;
+  color: white;
+  height: 60px;
+  padding-top: 7px;
+  margin-bottom: 10px;
+  z-index: 1;
+}
+
+.panel-group{
+  top: 60;
+  display: inline-block;
+  width: 200px;
+  vertical-align: top;
+}
+
+body {
+color: black;
+background-color: #fff;
+}
+
+/*D3*/
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+.axis path,
+.axis line {
+fill: none;
+stroke: #000;
+shape-rendering: crispEdges;
+}
+
+.line {
+fill: none;
+stroke: steelblue;
+stroke-width: 1.5px;
+}
+
+.area{
+  fill: steelblue;
+  clip-path: url(#clip);
+}
+
+.text{
+  color: white;
+}
+ /*Other*/
+.nav{
+  padding: 10px;
+}
+ .nav-tab{
+   border: solid #000;
+  border-width: 0 0 1 0px;
+  margin-bottom: 0px;
+
+ }

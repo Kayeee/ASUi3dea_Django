@@ -1,17 +1,57 @@
 from django.shortcuts import render, get_object_or_404, render_to_response
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
-
+from django.apps import apps
+import json
 from celery import Celery
-from .models import Inverter, Pi
-
-# Create your views here.
+from .models import Inverter, Pi, Temperature, Mode, Address
 
 @login_required
 def loggedin(request):
     pi_list_json = serializers.serialize("json", Pi.objects.all())
+    models = apps.get_app_config('ASUi3dea').get_models()
+    wanted_models = []
+    for model in models:
+        if (model.__name__ is not 'Pi') and (model.__name__ is not 'Inverter'):
+            wanted_models.append(model.__name__)
+    wanted_models = json.dumps(wanted_models)
     context = {'pi_list_json': pi_list_json,
-                'full_name': request.user.username}
+                'full_name': request.user.username,
+                'available_models': wanted_models}
+    return render(request,'ASUi3dea/authUser.html', context)
+
+@login_required
+def choropleth_data(request, data_type):
+    #TODO: ELIMATE THIS NEXT SECTION. IT IS A COPY OF STUFF DONE IN 'loggedin'
+    pi_list_json = serializers.serialize("json", Pi.objects.all())
+    models = apps.get_app_config('ASUi3dea').get_models()
+    wanted_models = []
+    for model in models:
+        if (model.__name__ is not 'Pi') and (model.__name__ is not 'Inverter'):
+            wanted_models.append(model.__name__)
+    wanted_models = json.dumps(wanted_models)
+    context = {'pi_list_json': pi_list_json,
+                'full_name': request.user.username,
+                'available_models': wanted_models}
+    #END OF TO DO SECTION. I SHOULDN'T HAVE HAD TO WRITE THAT CODE TWICE SHOULD BE EASILY FIXABLE LATER.
+    model = apps.get_model(app_label='ASUi3dea', model_name=data_type)
+    states = Address.objects.values('state').distinct()
+    stateValues = {}
+    for state in states:
+        ads_for_pis = Address.objects.filter(state = state['state'])
+        inverters = []
+        for a in ads_for_pis:
+
+            inverters = [x for x in a.pi.inverter_set.all()]
+        all_datas = [i.temperature_set.last() for i in inverters]
+        total = 0.0
+        for data in all_datas:
+            if data is not None:
+                total += data.get_data()[1]
+        stateValues[state['state']] = total/len(all_datas)
+        print(stateValues)
+        context['stateValues'] = json.dumps(stateValues)
+
     return render(request,'ASUi3dea/authUser.html', context)
 
 @login_required

@@ -1,17 +1,21 @@
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
 from django.core import serializers
 from django.core.context_processors import csrf
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-import json
 from django.core.serializers.json import DjangoJSONEncoder
-import time
 from django.db import models
+from django.apps import apps
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Inverter, Pi
 from celery import Celery
-from .tasks import add
+from .tasks import pull_data
 
+import geohash
+import re
+import time
+import json
 
 def rabbitTest(request):
     result = add.delay(request)
@@ -26,17 +30,14 @@ def save_controls(request):
         #The POST request sends Either "True" or nothing for the checkbox
         try:
             invt_to_chng = Inverter.objects.get(pk=request.POST['pk'])
-
             try:
                 invt_to_chng.state = request.POST['on_off']
                 #result = add.delay(1)
             except:
                 invt_to_chng.state = False
                 #result = add.delay(0)
-
             #while not result.status:
             #    time.sleep(0)
-
             invt_to_chng.save()
             #msg = result.get()
             msg="Data Saved"
@@ -48,6 +49,14 @@ def save_controls(request):
         msg = "GET petitions are not allowed for this view."
 
     return HttpResponse(msg)
+
+def single_overview(request, inverter_pk ):
+    models = apps.get_app_config('ASUi3dea').get_models()
+    for model in models:
+        if (model.__name__ is not 'Pi') and (model.__name__ is not 'Inverter') and (model.__name__ is not 'Address'):
+            model_object = apps.get_model(app_label='ASUi3dea', model_name=model.__name__)
+            instance_list = model_object.objects.filter(inverter_id=inverter_pk)
+            #print("instance_list: {0}".format(instance_list))
 
 def get_pi_data(request):
     lat = request.GET['lat']
@@ -62,6 +71,7 @@ def get_pi_data(request):
     data = serializers.serialize("json", inverters)
     return HttpResponse(data)
 
+#gest data from database
 def get_inverter_data(request, inverter_pk, data_set):
     inverter = Inverter.objects.get(pk=inverter_pk)
     data = getattr(inverter, data_set).all()
@@ -73,3 +83,74 @@ def get_inverter_data(request, inverter_pk, data_set):
 
     #data_tuples = serializers.serialize("json", data_tuples)
     return JsonResponse(data_tuples, safe=False)
+
+def pull_data_from_inverter(request, inverter_pk):
+    pi_id = re.sub(r'-(.*)', '', inverter_pk)
+    #result_json = pull_data.delay(re.sub(r'(.*)-', '', inverter_pk))
+    #while not result_json.status:
+        #time.sleep(0)
+    result_json = '{"inverter": "1", "temperature": 25}'
+    #print("Result Json: {0}".format(result_json.get()))
+    #result = json.loads(result_json.get())
+    result = json.loads(result_json)
+    print(result)
+    save_data(result, pi_id)
+    return HttpResponseRedirect('/ASUi3dea/' + inverter_pk)
+
+@csrf_exempt
+def recieve_data_to_save(request):
+    lat = request.GET.get('lat', -1)
+    lon = request.GET.get('lon', -1)
+    print("Lat {0} long: {1}".format(float(lat), float(lon)))
+    pi_geohash = geohash.encode(float(lat), float(lon), 24)
+    print("geohash: {0}".format(pi_geohash))
+    inverter = request.GET.get('inverter', -1)
+    temperature = request.GET.get('temperature', -1)
+    #hs_temp = request.POST.get('HSTemp', -1)
+    dc_power = request.GET.get('dcpower', -1)
+    ac_power = request.GET.get('acpower', -1)
+    status = request.GET.get("status", -1)
+
+    values_dict = {'inverter': inverter, 'temperature': temperature, 'dcpower': dc_power, 'acpower': ac_power, 'status': status}
+    #values_dict = {'inverter': inverter, 'temperature': temperature}
+    print("Values_dict: {0}".format(values_dict))
+    save_data(values_dict, pi_geohash)
+    return HttpResponse("Data Recieved Successfully")
+
+
+def save_data(result, pi_id):
+    inverter_id = pi_id + '-' + result["inverter"]
+    print("inverter ID: {0}".format(inverter_id))
+    for model in result:
+        print("Model: {0}".format(model))
+        #available_models=apps.get_app_config('ASUi3dea').get_models()
+        if model is not "inverter":
+            try:
+                model_object = apps.get_model(app_label='ASUi3dea', model_name=model)
+                new_obj = model_object.objects.create(inverter_id=inverter_id) #create the model object
+                new_obj.set_data(result[model])
+                new_obj.save()
+            except:
+                print("Either Pi or Inverter does not exist")
+                return HttpResponseBadRequest()
+
+def register_pi(request):
+    lat = request.POST['latitude']
+    lon = request.POST['longitude']
+    pi_geohash = geohash.encode(lat, lon, 30)
+
+    if not Pi.objects.filter(id=pi_geohash):#No pi's registered
+        Pi.objects.create(id=geohash, latitude = lat, longitude=lon)
+        return HttpResponse("Successfully registered Pi")
+    else:
+        return HttpResponse("Pi is already registered")
+
+def register_inverter(request):
+    lat = request.POST['latitude']
+    lon = request.POST['longitude']
+    pi_geohash = geohash.encode(lat, lon, 30)
+    if Pi.objects.filter(id=pi_geohash):#Pi is registered
+        Inverter.objects.create(pi_id=pi_geohash)
+        return HttpResponse("Successfully registered Inverter")
+    else:
+        return HttpResponse("The Pi you are tyring to register this inverter with does not exist.")
