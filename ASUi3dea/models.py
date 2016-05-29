@@ -1,11 +1,29 @@
 import datetime
 
 from django.db import models
+from django.contrib.auth.models import User, AbstractBaseUser
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 import geohash
 import re
 # Create your models here.
+
+@python_2_unicode_compatible
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+    REQUIRED_FIELDS = ('user',)
+    USERNAME_FIELD = ('username')
+
+    def __str__(self):
+        return u'Profile of user: %s' % self.user.username
+
+@python_2_unicode_compatible
+class InverterGroup(models.Model):
+    name = models.CharField(max_length=30, default = "")
+    owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "{0} owns this group ({1})".format(self.owner, self.name)
 
 @python_2_unicode_compatible
 class Pi(models.Model):
@@ -33,7 +51,9 @@ class Inverter(models.Model):
     SerialNumber = models.IntegerField(default = -1)
     DeviceAddress = models.IntegerField(default = -1)
     SunSpecDIDphase = models.CharField(max_length=20, default="-1")
-    id = models.CharField(max_length=255, primary_key=True, default=None, blank=True)
+    groups = models.ManyToManyField(InverterGroup, editable = False)
+    custom_name = models.CharField(max_length=30, default = "", blank=True)
+    id = models.CharField(editable = False, max_length=255, primary_key=True, default=None, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.pk:  # object is being created, thus no primary key field yet
@@ -44,6 +64,9 @@ class Inverter(models.Model):
                 self.id = self.pi.id + '-' + str(int(stripped_inverter_id[0]) + 1)
             else:
                 self.id = self.pi.id + '-0'
+
+        if self.custom_name is "":
+            self.custom_name = self.id
         super(Inverter, self).save(*args, **kwargs)
 
     def is_on(self):
@@ -125,7 +148,7 @@ class ACPower(models.Model):
     def set_data(self, new_power):
         self.power = new_power
     def __str__(self):
-        return "Time: {0}, Value: {1}".format(timestamp, power)
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.power)
 
 
 @python_2_unicode_compatible
@@ -139,7 +162,7 @@ class DCPower(models.Model):
     def set_data(self, new_power):
         self.power = new_power
     def __str__(self):
-        return "Time: {0}, Value: {1}".format(timestamp, power)
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.power)
 
 @python_2_unicode_compatible
 class ACEnergyWH(models.Model):
@@ -152,45 +175,4 @@ class ACEnergyWH(models.Model):
     def set_data(self, new_watt_hours):
         self.watt_hours = new_watt_hours
     def __str__(self):
-        return "Time: {0}, Value: {1}".format(timestamp, watt_hours)
-
-
-# class Voltage(models.Model):
-#     inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
-#     voltage = models.FloatField(default = 0)
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     generic_name = models.CharField(max_length=20, default = "Voltage")
-#     def get_data(self):
-#         return (self.timestamp, self.voltage)
-#
-# class PowerQuality(models.Model):
-#     inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
-#     power_quality = models.CharField(max_length=20, default = "Good")
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     generic_name = models.CharField(max_length=20, default = "PowerQuality")
-#     def get_data(self):
-#         return (self.timestamp, self.power_quality)
-#
-# class Current(models.Model):
-#     inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
-#     current = models.FloatField(default = 0)
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     generic_name = models.CharField(max_length=20, default = "Current")
-#     def get_data(self):
-#         return (self.timestamp, self.current)
-#
-# class Wattage(models.Model):
-#     inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
-#     wattage = models.FloatField(default = 0)
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     generic_name = models.CharField(max_length=20, default = "Wattage")
-#     def get_data(self):
-#         return (self.timestamp, self.wattage)
-#
-# class Frequency(models.Model):
-#     inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
-#     frequency = models.FloatField(default = 0)
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     generic_name = models.CharField(max_length=20, default = "Frequency")
-#     def get_data(self):
-#         return (self.timestamp, self.frequency)
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.watt_hours)

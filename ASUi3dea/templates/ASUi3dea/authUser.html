@@ -1,10 +1,15 @@
 <html>
 <!-- pi List -->
 {% load staticfiles %}
+<title>
+  ASUi3dea Authorized User
+</title>
 <head>
   <script>
     var pi_list = {{pi_list_json|safe}}; //json so doesn't need quotes
     var available_models = {{available_models|safe}};
+    var groups = {{groups_json|safe}}
+    var csrfToken = '{{csrf_token}}'
   </script>
 
  <script src="{% static "ASUi3dea/js/jquery-1.12.0.js" %}"/></script>
@@ -17,15 +22,51 @@
 
  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
- <link href="{% static "ASUi3dea/css/authUser.css" %}" rel="stylesheet"/></script>
+ <link href="{% static "ASUi3dea/css/authUser.css" %}" rel="stylesheet"/>
+
+<!--  marker cluster -->
+ <link rel="stylesheet" href="{% static "ASUi3dea/node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css" %}"/>
+ <script src="{% static "ASUi3dea/node_modules/leaflet.markercluster/dist/leaflet.markercluster-src.js" %}"/></script>
+
 </head>
 
 <body>
+  <script>
+    //sample of how to format json
+    // groups = jQuery.parseJSON(`
+    //   [
+    //     {
+    //       "name" : "My-first-Group",
+    //       "inverters" : [
+    //         {
+    //           "inverterName": "9tbt6xjthvjvez32e5jg6e00-0",
+    //           "lat": 33.3059398,
+    //           "lon": -111.6792469
+    //         },
+    //         {
+    //           "inverterName": "9tbt6xjthvjvez32e5jg6e00-1",
+    //           "lat": 33.3059398,
+    //           "lon": -111.6792469}
+    //       ]
+    //     },
+    //     {
+    //       "name": "Second-Group",
+    //       "inverters" :
+    //         [
+    //           {
+    //             "inverterName": "9tbt6xjthvjvez32e5jg6e00-0",
+    //             "lat": 33.3059398,
+    //             "lon": -111.6792469
+    //           }
+    //         ]
+    //       }
+    //     ]`)
+  </script>
   <header>
-    <span>
-      <h2 style="display: inline-block; margin: 5px;"> Hi {{full_name}}, you are logged in! </h2>
-      <p style="float: right; display: inline-block;"> Click <a href="/ASUi3dea/logout/">here</a> to logout. </p>
-    </span>
+    <div>
+      <h4 style=" margin: 5px; float: right;"> logged in as {{full_name}} </h2>
+      <p style="clear: right; float: right;"> Click <a href="/ASUi3dea/logout/">here</a> to logout. </p>
+    </div>
   </header>
 
 <!--
@@ -40,15 +81,29 @@
   <div id="maplist">
     <div id="map"></div>
     <div class="listContainer">
-      <div class="list-group", id="inverters"></div>
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
+        <li><a data-toggle="tab" href="#mygroups">My Groups</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+          <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Add all to group
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu" id="group-dropdown"></ul>
+          </div>
+          <div class="list-group", id="inverters"></div>
+        </div>
+          <div id="mygroups" class="tab-pane fade">
+            <div class="list-group", id="groups"></div>
+          </div>
+      </div>
     </div>
   </div>
 
  <script src="{% static "ASUi3dea/js/map.js" %}"></script>
 </body>
-<script>
- var stateValues = {{stateValues|safe}};
-</script>
 </html>
 <!-- Sample From
       <form id="controlFrm" action="/ASUi3dea/save_controls/" method="POST">{% csrf_token %}

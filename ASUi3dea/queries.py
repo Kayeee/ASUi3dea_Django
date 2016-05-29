@@ -7,6 +7,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.apps import apps
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
 
 from .models import Inverter, Pi
 from celery import Celery
@@ -52,11 +53,29 @@ def save_controls(request):
 
 def single_overview(request, inverter_pk ):
     models = apps.get_app_config('ASUi3dea').get_models()
+    dataDict = {}
     for model in models:
         if (model.__name__ is not 'Pi') and (model.__name__ is not 'Inverter') and (model.__name__ is not 'Address'):
             model_object = apps.get_model(app_label='ASUi3dea', model_name=model.__name__)
             instance_list = model_object.objects.filter(inverter_id=inverter_pk)
-            #print("instance_list: {0}".format(instance_list))
+
+            if instance_list:
+                dataDict[model.__name__] = [(f.get_data()[0],f.get_data()[1]) for f in instance_list]
+            # if instance_list:
+            #     head.append(model.__name__)
+            # if not triplets:
+
+            #     for dataPiece in instance_list:
+            #         triplets.append(list(dataPiece.get_data()))
+            # else:
+            #     counter = 0
+            #     for dataPiece in instance_list:
+            #         current = instance_list[counter]
+            #         triplets[counter].append(dataPiece.get_data()[1])#timestamps are already in there, we just want the values
+            #         counter += 1
+
+    print("triplets: {0}".format(dataDict))
+    return JsonResponse(dataDict, safe=False)
 
 def get_pi_data(request):
     lat = request.GET['lat']
@@ -137,7 +156,7 @@ def save_data(result, pi_id):
 def register_pi(request):
     lat = request.POST['latitude']
     lon = request.POST['longitude']
-    pi_geohash = geohash.encode(lat, lon, 30)
+    pi_geohash = geohash.encode(lat, lon, 24)
 
     if not Pi.objects.filter(id=pi_geohash):#No pi's registered
         Pi.objects.create(id=geohash, latitude = lat, longitude=lon)
@@ -148,9 +167,26 @@ def register_pi(request):
 def register_inverter(request):
     lat = request.POST['latitude']
     lon = request.POST['longitude']
-    pi_geohash = geohash.encode(lat, lon, 30)
+    pi_geohash = geohash.encode(lat, lon, 24)
     if Pi.objects.filter(id=pi_geohash):#Pi is registered
         Inverter.objects.create(pi_id=pi_geohash)
         return HttpResponse("Successfully registered Inverter")
     else:
         return HttpResponse("The Pi you are tyring to register this inverter with does not exist.")
+
+@login_required
+def create_group(request):
+    user = request.user
+    group = request.POST['group']
+    inverters = request.POST['inverters']
+
+@login_required
+def add_to_group(request):
+    user = User.objects.get(username = request.user) #user Object
+    group = request.POST['group']
+    inverters = request.POST.getlist('inverters[]', False)
+    print "user: {0}, group: {1}, inverters: {2}".format(user, group, inverters)
+    for i in inverters:
+        inverter = Inverter.objects.get(pk = i)
+        user.userprofile.invertergroup_set.get(name=group).inverter_set.add(inverter)
+    return HttpResponse("Successfully added to group")

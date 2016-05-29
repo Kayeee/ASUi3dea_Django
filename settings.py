@@ -31,6 +31,13 @@ DEBUG = True
 LOGIN_URL = '/ASUi3dea/login/'
 ALLOWED_HOSTS = ['.localhost']
 
+#AUTH_USER_MODEL = 'ASUi3dea.UserProfile'
+
+#Authentication backends
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
+    
 ADMINS = (
     ('Kevin', 'keverly1@asu.edu')
 )

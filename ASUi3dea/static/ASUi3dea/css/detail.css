@@ -9,6 +9,15 @@ header{
   z-index: 1;
 }
 
+main{
+  height: 100%;
+}
+
+#chart svg {
+  height: 400px;
+
+}
+
 .panel-group{
   top: 60;
   display: inline-block;

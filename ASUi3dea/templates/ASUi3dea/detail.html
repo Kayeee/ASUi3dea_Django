@@ -39,7 +39,9 @@
           <script>
           $("#overview").click(function() {
               d3.json("{{overview_url}}", function(error, data) {
-                //draw_line_graph(data);
+                for (var attribute in data){
+                  drawPowerGraph(data[attribute]);
+                }
               });
             });
           </script>
@@ -106,8 +108,9 @@
 </div>
 
   <!--analytics container-->
-  <div id="analytics" style="display: inline-block;"></div>
+  <div id="analytics" style="display: inline-block;" width="1000" height="500"></div>
 
 </main>
 <script src="{% static "ASUi3dea/js/graph.js" %}"/></script>
+<script src="{% static "ASUi3dea/js/multiLine.js" %}"/></script>
 </body>

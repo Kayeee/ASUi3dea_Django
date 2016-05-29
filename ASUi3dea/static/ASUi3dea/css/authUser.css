@@ -2,10 +2,35 @@ header{
   background-color: black;
   color: white;
   height: 60px;
-  padding-top: 22px;
+  padding-top: 0px;
   margin-bottom: 10px;
 }
+#group-buttons-container{
+  margin: 0 auto;
+  margin-bottom: 3px;
+  width: 75%;
+}
 
+#home{
+  overflow-y: scroll;
+  height: 550px;
+}
+.group-button{
+  width: 49%;
+}
+
+#create-group-button{
+  margin: 0 auto;
+  width: 75%;
+}
+.panel{
+  margin: 0 auto;
+  width: 75%;
+}
+
+.tab-content{
+  margin-top: 10px;
+}
 #map {
   height: 650px;
   width: 900;

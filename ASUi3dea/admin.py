@@ -5,6 +5,5 @@ from .models import *
 # # Register your models here.
 admin.site.register(Inverter)
 admin.site.register(Pi)
-admin.site.register(Temperature)
-admin.site.register(Mode)
-admin.site.register(Address)
+admin.site.register(UserProfile)
+admin.site.register(InverterGroup)
