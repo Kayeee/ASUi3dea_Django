@@ -176,3 +176,143 @@ class ACEnergyWH(models.Model):
         self.watt_hours = new_watt_hours
     def __str__(self):
         return "Time: {0}, Value: {1}".format(self.timestamp, self.watt_hours)
+
+#- - - - - - - - - - - - - - - - - Values I can get using AuroraC - - - - - - - - - - -
+@python_2_unicode_compatible
+class ConversionEfficiency(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    value = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=30, default = "Conv_Efficiency")
+    def get_data(self):
+        return (self.timestamp, self.value)
+    def set_data(self, new_value):
+        self.value = new_value
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.value)
+
+
+@python_2_unicode_compatible
+class InputVoltage(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    value = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=20, default = "Input_Voltage")
+    def get_data(self):
+        return (self.timestamp, self.value)
+    def set_data(self, new_value):
+        self.value = new_value
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.value)
+
+@python_2_unicode_compatible
+class InputCurrent(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    value = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=20, default = "Input_Current")
+    def get_data(self):
+        return (self.timestamp, self.value)
+    def set_data(self, new_value):
+        self.value = new_value
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.value)
+
+@python_2_unicode_compatible
+class InputPower(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    value = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=20, default = "Input_Power")
+    def get_data(self):
+        return (self.timestamp, self.value)
+    def set_data(self, new_value):
+        self.value = new_value
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.value)
+
+@python_2_unicode_compatible
+class GridVoltage(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    value = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=20, default = "Grid_Voltage")
+    def get_data(self):
+        return (self.timestamp, self.value)
+    def set_data(self, new_value):
+        self.value = new_value
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.value)
+
+@python_2_unicode_compatible
+class GridCurrent(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    value = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=20, default = "Grid_Current")
+    def get_data(self):
+        return (self.timestamp, self.value)
+    def set_data(self, new_value):
+        self.value = new_value
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.value)
+
+@python_2_unicode_compatible
+class GridPower(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    value = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=20, default = "Grid_Power")
+    def get_data(self):
+        return (self.timestamp, self.value)
+    def set_data(self, new_value):
+        self.value = new_value
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.value)
+
+@python_2_unicode_compatible
+class Frequency(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    value = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=20, default = "Frequency")
+    def get_data(self):
+        return (self.timestamp, self.value)
+    def set_data(self, new_value):
+        self.value = new_value
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.value)
+
+@python_2_unicode_compatible
+class InverterTemperature(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    value = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=25, default = "Inverter_Temperature")
+    def get_data(self):
+        return (self.timestamp, self.value)
+    def set_data(self, new_value):
+        self.value = new_value
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.value)
+
+@python_2_unicode_compatible
+class CumulatedEnergy(models.Model):
+    inverter = models.ForeignKey(Inverter, on_delete=models.CASCADE)
+    day = models.FloatField(default = -1)
+    week = models.FloatField(default = -1)
+    month = models.FloatField(default = -1)
+    year = models.FloatField(default = -1)
+    total = models.FloatField(default = -1)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    generic_name = models.CharField(max_length=25, default = "Cumulated_Energy")
+    def get_data(self):
+        return (self.timestamp, self.day, self.week, self.month, self.year, self.total)
+    def set_data(self, new_day, new_week, new_month, new_year, new_total):
+        self.day = new_day
+        self.week = new_week
+        self.month = new_month
+        self.year = new_year
+        self.total = new_total
+    def __str__(self):
+        return "Time: {0}, Value: {1}".format(self.timestamp, self.day, self.week, self.month, self.year, self.total)

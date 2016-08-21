@@ -30,6 +30,12 @@ urlpatterns = [
     url(r'^create_group/$', queries.create_group, name='create_group'),
     url(r'^add_to_group/$', queries.add_to_group, name='add_to_group'),
     url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/single_overview/$', queries.single_overview, name='single_overview' ),
+    url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/power_query/$', queries.power_query, name='power_query' ),
+    url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/current_query/$', queries.current_query, name='current_query' ),
+    url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/voltage_query/$', queries.voltage_query, name='voltage_query' ),
+    url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/efficiency_query/$', queries.efficiency_query, name='efficiency_query' ),
+    url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/energy_query/$', queries.energy_query, name='energy_query' ),
+    url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/temperature_query/$', queries.temperature_query, name='temperature_query' ),
     url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/update/$', queries.pull_data_from_inverter, name='pull_data_from_inverter'),
     url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/(?P<data_set>.*)/$', queries.get_inverter_data, name='get_inverter_data')
 ]

@@ -3,16 +3,35 @@
   <!-- jquery-->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <!--bootstrap-->
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <!-- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
   <!--static-->
   <link rel="stylesheet" type="text/css" href="{% static "ASUi3dea/css/detail.css" %}">
-  <link rel="stylesheet" type="text/css" href="{% static "ASUi3dea/css/bootstrap-switch.css" %}">
-  <script src="{% static "ASUi3dea/js/bootstrap-switch.js" %}"></script>
-  <!--d3-->
-  <script src="//d3js.org/d3.v3.min.js"></script>
+  <!-- <link rel="stylesheet" type="text/css" href="{% static "ASUi3dea/css/bootstrap-switch.css" %}"> -->
+  <!-- <script src="{% static "ASUi3dea/js/bootstrap-switch.js" %}"></script> -->
 
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript"
+      src='https://www.google.com/jsapi?autoload={
+        "modules":[{
+        "name":"visualization",
+        "version":"1"
+        }]
+      }'></script>
+{% url 'ASUi3dea:power_query' inverter_pk=inverter.pk as power_url %}
+{% url 'ASUi3dea:current_query' inverter_pk=inverter.pk as current_url %}
+{% url 'ASUi3dea:voltage_query' inverter_pk=inverter.pk as voltage_url %}
+{% url 'ASUi3dea:efficiency_query' inverter_pk=inverter.pk as efficiency_url %}
+{% url 'ASUi3dea:energy_query' inverter_pk=inverter.pk as energy_query %}
+{% url 'ASUi3dea:temperature_query' inverter_pk=inverter.pk as temperature_query %}
   <script>
+    var voltageURL = "{{voltage_url}}"
+    var currentURL = "{{current_url}}"
+    var powerURL = "{{power_url}}"
+    var efficiencyURL = "{{efficiency_url}}"
+    var energyURL = "{{energy_query}}"
+    var temperatureURL = "{{temperature_query}}"
     var inverter = "{{inverter}}";
   </script>
 
@@ -21,8 +40,7 @@
 <body>
   <header>
     <span>
-      <h5 style="margin: 0px;">ID:</h5>
-      <h1 style="display: inline-block; margin: 0px;">{{ inverter.pk }}</h1>
+      <h1 style="display: inline-block; color: white; vertical-align: middle;">{{ inverter.pk }}</h1>
       <p style="float: right; display: inline-block;"> Click <a href="/ASUi3dea/logout/">here</a> to logout. </p>
     </span>
   </header>
@@ -30,27 +48,30 @@
   <main>
   <!--side panel-->
   <!--Overview-->
-  <div class="panel-group">
+  <!--
+  <<div class="panel-group" style="z-index: 10px">
     <div class="panel panel-default" id="navigator" >
         <div class="panel-heading">
         <h4 class="panel-title">
           <a data-toggle="collapse" id="overview" href="#collapse1">Overview</a>
-          {% url 'ASUi3dea:single_overview' inverter_pk=inverter.pk as overview_url %}
+
+
           <script>
-          $("#overview").click(function() {
-              d3.json("{{overview_url}}", function(error, data) {
-                for (var attribute in data){
-                  drawPowerGraph(data[attribute]);
-                }
-              });
-            });
+          // $("#overview").click(function() {
+          //
+          //     // d3.json("{{overview_url}}", function(error, data) {
+          //     //   for (var attribute in data){
+          //     //     drawPowerGraph(data[attribute]);
+          //     //   }
+          //     // });
+          //   });
           </script>
         </h4>
 
       </div>
     </div>
 
-    <!--Controls-->
+    Controls
     <div class="panel panel-default" id="navigator" >
         <div class="panel-heading">
         <h4 class="panel-title">
@@ -76,7 +97,7 @@
       </div>
     </div>
 
-    <!--Attributes-->
+    Attributes
     <div class="panel panel-default" id="navigator" >
       <div class="panel-heading">
         <h4 class="panel-title">
@@ -89,7 +110,7 @@
           {% for attribute in attributes %}
               {% url 'ASUi3dea:get_inverter_data' inverter_pk=inverter.pk data_set=attribute.0 as the_url %}
               <li class="nav-tab"><a id="{{attribute.0}}" href="#section2"> {{ attribute.1.generic_name }}</a></li>
-              <!--<li class="nav-tab"><a id="{{attribute.0}}" href="#section2"> {{ attribute.1.generic_name }}: {{attribute.1.get_data.1}}</a></li>-->
+              <li class="nav-tab"><a id="{{attribute.0}}" href="#section2"> {{ attribute.1.generic_name }}: {{attribute.1.get_data.1}}</a></li>
               <script>
               $("#{{attribute.0}}").click(function() {
                   d3.json("{{the_url}}", function(error, data) {
@@ -99,18 +120,28 @@
               </script>
           {% endfor %}
         </ul>
-    </div>
-  </div>
+    </div>-->
+
+  <!--Update Button -->
   {% url 'ASUi3dea:pull_data_from_inverter' inverter_pk=inverter.pk as update_url%}
-  <form action="{{update_url}}" style="margin: 1em;">{% csrf_token %}
-      <input type="button" onclick="location.href='{{update_url}}';" class="btn btn-primary" value="Update" />
+  <form action="{{update_url}}" style= "float: right; margin: 10px;">{% csrf_token %}
+      <input type="button" onclick="location.href='{{update_url}}';" class="action" value="Update" />
   </form>
-</div>
+  </div>
 
-  <!--analytics container-->
-  <div id="analytics" style="display: inline-block;" width="1000" height="500"></div>
+  <div id="controls" class="left-sidebar">
+    <span> Some sample Text </span>
+  </div>
+  <!--analytics containers-->
+    <div class="chart-container">
+      <div id="energy-chart" class="chart"></div>
+      <div id="temperature-chart" class="chart"></div>
+      <div id="power-line" class="chart"></div>
+      <div id="current-line" class="chart"></div>
+      <div id="voltage-line" class="chart"></div>
+      <div id="efficiency-area" class="chart"></div>
+    </div>
+  </main>
 
-</main>
-<script src="{% static "ASUi3dea/js/graph.js" %}"/></script>
-<script src="{% static "ASUi3dea/js/multiLine.js" %}"/></script>
+  <script src="{% static "ASUi3dea/js/googleGraphs.js" %}"/></script>
 </body>

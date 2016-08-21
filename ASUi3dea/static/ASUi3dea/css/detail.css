@@ -1,11 +1,10 @@
 
 header{
   width: 100%;
-  background-color: black;
+  background-color: #262626;
   color: white;
   height: 60px;
   padding-top: 7px;
-  margin-bottom: 10px;
   z-index: 1;
 }
 
@@ -13,9 +12,21 @@ main{
   height: 100%;
 }
 
-#chart svg {
-  height: 400px;
+.left-sidebar{
+  float: left;
+  width: 200px;
+  height: 100%;
+  background-color: #F9F9F9;
+  margin: 10px;
+}
 
+.chart {
+  display: inline-block;
+}
+
+.chart-container{
+  display: inline-block;
+  width: 80%;
 }
 
 .panel-group{
@@ -29,42 +40,3 @@ body {
 color: black;
 background-color: #fff;
 }
-
-/*D3*/
-.brush .extent {
-  stroke: #fff;
-  fill-opacity: .125;
-  shape-rendering: crispEdges;
-}
-
-.axis path,
-.axis line {
-fill: none;
-stroke: #000;
-shape-rendering: crispEdges;
-}
-
-.line {
-fill: none;
-stroke: steelblue;
-stroke-width: 1.5px;
-}
-
-.area{
-  fill: steelblue;
-  clip-path: url(#clip);
-}
-
-.text{
-  color: white;
-}
- /*Other*/
-.nav{
-  padding: 10px;
-}
- .nav-tab{
-   border: solid #000;
-  border-width: 0 0 1 0px;
-  margin-bottom: 0px;
-
- }

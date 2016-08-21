@@ -9,10 +9,12 @@ from django.apps import apps
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 
-from .models import Inverter, Pi
+from .models import *
 from celery import Celery
-from .tasks import pull_data
+from .tasks import *
 
+
+#from .formatter import formatter
 import geohash
 import re
 import time
@@ -55,8 +57,9 @@ def single_overview(request, inverter_pk ):
     models = apps.get_app_config('ASUi3dea').get_models()
     dataDict = {}
     for model in models:
-        if (model.__name__ is not 'Pi') and (model.__name__ is not 'Inverter') and (model.__name__ is not 'Address'):
+        if (model.__name__ is not 'Pi') and (model.__name__ is not 'Inverter') and (model.__name__ is not 'Address') and (model.__name__ is not 'UserProfile') and (model.__name__ is not 'InverterGroup'):
             model_object = apps.get_model(app_label='ASUi3dea', model_name=model.__name__)
+            print("name: {0}".format(model.__name__))
             instance_list = model_object.objects.filter(inverter_id=inverter_pk)
 
             if instance_list:
@@ -76,6 +79,54 @@ def single_overview(request, inverter_pk ):
 
     print("triplets: {0}".format(dataDict))
     return JsonResponse(dataDict, safe=False)
+
+def power_query(request, inverter_pk):
+    data_dict = {}
+    input_powers = InputPower.objects.filter(inverter_id=inverter_pk)
+    grid_powers = GridPower.objects.filter(inverter_id=inverter_pk)
+    if input_powers and grid_powers:
+        data_dict[InputPower.__name__] = [(f.get_data()[0],f.get_data()[1]) for f in input_powers]
+        data_dict[GridPower.__name__] = [(f.get_data()[0],f.get_data()[1]) for f in grid_powers]
+    return JsonResponse(data_dict, safe=False)
+
+def current_query(request, inverter_pk):
+    data_dict = {}
+    input_currents = InputCurrent.objects.filter(inverter_id=inverter_pk)
+    grid_currents = GridCurrent.objects.filter(inverter_id=inverter_pk)
+    if input_currents and grid_currents:
+        data_dict[InputCurrent.__name__] = [(f.get_data()[0],f.get_data()[1]) for f in input_currents]
+        data_dict[GridCurrent.__name__] = [(f.get_data()[0],f.get_data()[1]) for f in grid_currents]
+    return JsonResponse(data_dict, safe=False)
+
+def voltage_query(request, inverter_pk):
+    data_dict = {}
+    input_voltages = InputVoltage.objects.filter(inverter_id=inverter_pk)
+    grid_voltages = GridVoltage.objects.filter(inverter_id=inverter_pk)
+    if input_voltages and grid_voltages:
+        data_dict[InputVoltage.__name__] = [(f.get_data()[0],f.get_data()[1]) for f in input_voltages]
+        data_dict[GridVoltage.__name__] = [(f.get_data()[0],f.get_data()[1]) for f in grid_voltages]
+    return JsonResponse(data_dict, safe=False)
+
+def efficiency_query(request, inverter_pk):
+    data_dict = {}
+    efficiencies = ConversionEfficiency.objects.filter(inverter_id=inverter_pk)
+    if efficiencies:
+        data_dict[ConversionEfficiency.__name__] = [(f.get_data()[0],f.get_data()[1]) for f in efficiencies]
+    return JsonResponse(data_dict, safe=False)
+
+def energy_query(request, inverter_pk):
+    data_dict = {}
+    energies = CumulatedEnergy.objects.filter(inverter_id=inverter_pk)
+    if energies:
+        data_dict[CumulatedEnergy.__name__] = [(f.get_data()[0],f.day,f.week) for f in energies]
+    return JsonResponse(data_dict, safe=False)
+
+def temperature_query(request, inverter_pk):
+    data_dict = {}
+    temperatures = InverterTemperature.objects.filter(inverter_id=inverter_pk)
+    if temperatures:
+        data_dict[InverterTemperature.__name__] = [(f.get_data()[0],f.get_data()[1]) for f in temperatures]
+    return JsonResponse(data_dict, safe=False)
 
 def get_pi_data(request):
     lat = request.GET['lat']
@@ -105,13 +156,15 @@ def get_inverter_data(request, inverter_pk, data_set):
 
 def pull_data_from_inverter(request, inverter_pk):
     pi_id = re.sub(r'-(.*)', '', inverter_pk)
-    #result_json = pull_data.delay(re.sub(r'(.*)-', '', inverter_pk))
-    #while not result_json.status:
-        #time.sleep(0)
-    result_json = '{"inverter": "1", "temperature": 25}'
+    result_json = getAll.delay(pi_id)
+    #result_json = createData()
+    while result_json.state != 'SUCCESS':
+        print result_json.state
+        time.sleep(5)
+    #result_json = '{"inverter": "1", "temperature": 25}'
     #print("Result Json: {0}".format(result_json.get()))
-    #result = json.loads(result_json.get())
-    result = json.loads(result_json)
+    result = json.loads(result_json.get())
+    #result = json.loads(result_json)
     print(result)
     save_data(result, pi_id)
     return HttpResponseRedirect('/ASUi3dea/' + inverter_pk)
@@ -143,15 +196,18 @@ def save_data(result, pi_id):
     for model in result:
         print("Model: {0}".format(model))
         #available_models=apps.get_app_config('ASUi3dea').get_models()
-        if model is not "inverter":
-            try:
-                model_object = apps.get_model(app_label='ASUi3dea', model_name=model)
-                new_obj = model_object.objects.create(inverter_id=inverter_id) #create the model object
+        if model != "inverter":
+            #try:
+            model_object = apps.get_model(app_label='ASUi3dea', model_name=model)
+            new_obj = model_object.objects.create(inverter_id=inverter_id) #create the model object
+            if model == "cumulatedenergy":
+                new_obj.set_data(result[model]["dailyenergy"], result[model]["weeklyenergy"], result[model]["monthlyenergy"], result[model]["yearlyenergy"], result[model]["totalenergy"])
+            else:
                 new_obj.set_data(result[model])
-                new_obj.save()
-            except:
-                print("Either Pi or Inverter does not exist")
-                return HttpResponseBadRequest()
+            new_obj.save()
+            # except:
+            #     print("Either Pi or Inverter does not exist")
+
 
 def register_pi(request):
     lat = request.POST['latitude']
