@@ -4,7 +4,7 @@ from celery import Celery
 import subprocess
 import random
 
-app = Celery('tasks', backend='amqp', broker='amqp://Kevin:ASUi3dea@54.224.107.102/pi_env')
+app = Celery('tasks', backend='amqp', broker='amqp://Kevin:ASUi3dea@52.87.223.187/pi_env')
 
 Inverter
 
