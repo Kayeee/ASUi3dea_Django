@@ -22,7 +22,7 @@ def initInverter(address, port):
     else:
         return "Error: Inverter is already initialized."
 
-@app.task
+@app.task(name='testingfile')
 def getAll(address, stringNum = "0"):
     inverter = Inverter()
     result = inverter.getAll("0")
