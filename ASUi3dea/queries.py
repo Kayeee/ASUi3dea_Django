@@ -163,6 +163,7 @@ def pull_data_from_inverter(request, inverter_pk):
         time.sleep(5)
     #result_json = '{"inverter": "1", "temperature": 25}'
     #print("Result Json: {0}".format(result_json.get()))
+    result_json = "{{" + result_json + "}}"
     result = json.loads(result_json.get())
     #result = json.loads(result_json)
     print(result)
