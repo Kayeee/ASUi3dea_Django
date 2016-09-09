@@ -4,11 +4,10 @@ from celery import Celery
 import subprocess
 import random
 
-app = Celery('tasks', backend='amqp', broker='amqp://Kevin:ASUi3dea@52.87.223.187/pi_env')
+app = Celery('interface_worker', backend='amqp', broker='amqp://Kevin:ASUi3dea@52.87.223.187/pi_env')
+app.config_from_object('celeryconfig')
 
-Inverter
-
-@app.task
+@app.task(name='addTask')
 def add(x, y):
     return x+y
 
@@ -35,19 +34,36 @@ def getAll(address, stringNum = "0"):
     # except KeyError:
     #     return "Error: Address not found."
 
+@app.task(name='getAlle')
+def getAlle(address, stringNum = "0"):
+    inverter = Inverter()
+    result = inverter.getAlle("0")
+    return result
+
 @app.task
 def updateAuroraC():
     try:
         subprocess.call(["sudo", "rm", "aurora"], cwd="/usr/local/bin")
     except OSError:
+
         print "aurora not found"
+
     subprocess.call(["make", "clean"], cwd="Documents/i3dea/aurora-1.9.0")
     subprocess.call(["git", "pull", "origin", "master"], cwd="Documents/i3dea/aurora-1.9.0") #need ssh key for this
     subprocess.call(["sudo", "make", "install"], cwd="Documents/i3dea/aurora-1.9.0")
+    return "Complete"
+
 
 @app.task
-def updateTasksAndInterface():
-    subprocess.call(["git", "pull", "origin", "master"])
+def updateAuroraC_e():
+    try:
+        subprocess.call(["sudo", "rm", "aurorae"], cwd="/usr/local/bin")
+    except OSError:
+        print "aurora not found"
+    subprocess.call(["make", "clean"], cwd="Documents/i3dea/aurora-exp")
+    subprocess.call(["git", "pull", "origin", "aurora_exp"], cwd="Documents/i3dea/aurora-exp") #need ssh key for this
+    subprocess.call(["sudo", "make", "install"], cwd="Documents/i3dea/aurora-exp")
+    return "Complete"
 
 def JSONify(data):
     return "{" + data + "}"
@@ -71,7 +87,7 @@ def createData():
 
     return """
     {{
-    \"inverter\": "0",
+        \"inverter\": "0",
         {0}
         {1}
         {2}
