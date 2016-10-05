@@ -12,6 +12,14 @@ main{
   height: 100%;
 }
 
+#options-content{
+  border-left: thin solid #fff;
+  display: inline-block;
+  vertical-align: middle;
+  width: auto;
+  padding: 0px 20px;
+}
+
 .left-sidebar{
   float: left;
   width: 200px;

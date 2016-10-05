@@ -1,11 +1,19 @@
+
 from inverterInterface import Inverter, ConnectionException
 from celery import Celery
+from kombu import Queue
 
 import subprocess
 import random
+import os
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
 
 app = Celery('interface_worker', backend='amqp', broker='amqp://Kevin:ASUi3dea@52.87.223.187/pi_env')
-app.config_from_object('celeryconfig')
+
+CELERY_DEFAULT_QUEUE = 'interface'
+CELERY_QUEUES = (Queue('interface', routing_key='interface'), Queue('updater', routing_key='updater'),)
+
 
 @app.task(name='addTask')
 def add(x, y):

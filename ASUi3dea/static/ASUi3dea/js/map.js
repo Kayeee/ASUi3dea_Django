@@ -129,7 +129,7 @@ $(document).ready(function() {
     //add to right list
     $.getJSON('/ASUi3dea/get_pi_data', {lat: m._latlng.lat, lng: m._latlng.lng}, function(data, jqXHR){
       for(inverter of data){
-        $("#inverters").append('<a href="/ASUi3dea/'+inverter.pk+'" class="list-group-item">'+inverter.pk+'</a>')
+        $("#inverters").append('<a href="/ASUi3dea/'+inverter.pk+'" class="list-group-item">'+inverter.fields.custom_name+'</a>')
       }
     });
     markers.removeLayer(m)

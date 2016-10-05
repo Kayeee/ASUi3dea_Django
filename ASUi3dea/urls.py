@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^update/$', queries.recieve_data_to_save, name='recieve_data_to_save'),
     url(r'^create_group/$', queries.create_group, name='create_group'),
     url(r'^add_to_group/$', queries.add_to_group, name='add_to_group'),
+    url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/change_invert_name/$', queries.change_invert_name, name='change_invert_name'),
     url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/single_overview/$', queries.single_overview, name='single_overview' ),
     url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/power_query/$', queries.power_query, name='power_query' ),
     url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/current_query/$', queries.current_query, name='current_query' ),

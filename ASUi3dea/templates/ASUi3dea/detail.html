@@ -39,8 +39,16 @@
 
 <body>
   <header>
-    <span>
-      <h1 style="display: inline-block; color: white; vertical-align: middle;">{{ inverter.pk }}</h1>
+    <span style="width: 100%;">
+      <h1 style="display: inline-block; color: white; vertical-align: middle; margin: 0px 20px;" id="invert_name">{{ inverter.custom_name }}</h1>
+      <div id="options-content">
+        <h3 style="display: inline-block; color: white; vertical-align: middle;">Change name</h3>
+        <!--update button-->
+        {% url 'ASUi3dea:pull_data_from_inverter' inverter_pk=inverter.pk as update_url%}
+        <form action="{{update_url}}" style= "float: right; margin: 10px;">{% csrf_token %}
+            <input type="button" onclick="location.href='{{update_url}}';" class="action" value="Update" />
+        </form>
+      </div>
       <p style="float: right; display: inline-block;"> Click <a href="/ASUi3dea/logout/">here</a> to logout. </p>
     </span>
   </header>
@@ -122,15 +130,13 @@
         </ul>
     </div>-->
 
-  <!--Update Button -->
-  {% url 'ASUi3dea:pull_data_from_inverter' inverter_pk=inverter.pk as update_url%}
-  <form action="{{update_url}}" style= "float: right; margin: 10px;">{% csrf_token %}
-      <input type="button" onclick="location.href='{{update_url}}';" class="action" value="Update" />
-  </form>
   </div>
 
   <div id="controls" class="left-sidebar">
-    <span> Some sample Text </span>
+    <ul>
+      <li>Control 1 </li>
+      <li>Control 2 </li>
+    </ul>
   </div>
   <!--analytics containers-->
     <div class="chart-container">

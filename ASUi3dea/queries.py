@@ -20,6 +20,7 @@ import re
 import time
 import json
 
+
 def rabbitTest(request):
     result = add.delay(request)
     time.sleep(10)
@@ -156,15 +157,23 @@ def get_inverter_data(request, inverter_pk, data_set):
 
 def pull_data_from_inverter(request, inverter_pk):
     pi_id = re.sub(r'-(.*)', '', inverter_pk)
-    result_json = getAll.delay(pi_id)
+    getAll = getAll.apply_async(args=[0], queue='interface', routing_key='interface')
     #result_json = createData()
-    while result_json.state != 'SUCCESS':
-        print result_json.state
-        time.sleep(5)
+    tries = 0
+    while getAll.state != 'SUCCESS':
+        print getAll.state
+        tries += 1
+        time.sleep(1)
+        if tries > 4:
+            break
+
+    if tries < 4:
+        result_json = ""
+    else:
+        result_json = "{{" + getAll.get() + "}}"
     #result_json = '{"inverter": "1", "temperature": 25}'
     #print("Result Json: {0}".format(result_json.get()))
-    result_json = "{{" + result_json + "}}"
-    result = json.loads(result_json.get())
+    result = json.loads(result_json)
     #result = json.loads(result_json)
     print(result)
     save_data(result, pi_id)
@@ -177,22 +186,17 @@ def recieve_data_to_save(request):
     print("Lat {0} long: {1}".format(float(lat), float(lon)))
     pi_geohash = geohash.encode(float(lat), float(lon), 24)
     print("geohash: {0}".format(pi_geohash))
-    inverter = request.GET.get('inverter', -1)
-    temperature = request.GET.get('temperature', -1)
-    #hs_temp = request.POST.get('HSTemp', -1)
-    dc_power = request.GET.get('dcpower', -1)
-    ac_power = request.GET.get('acpower', -1)
-    status = request.GET.get("status", -1)
 
-    values_dict = {'inverter': inverter, 'temperature': temperature, 'dcpower': dc_power, 'acpower': ac_power, 'status': status}
-    #values_dict = {'inverter': inverter, 'temperature': temperature}
     print("Values_dict: {0}".format(values_dict))
-    save_data(values_dict, pi_geohash)
+    # save_data(values_dict, pi_geohash)
     return HttpResponse("Data Recieved Successfully")
 
 
 def save_data(result, pi_id):
-    inverter_id = pi_id + '-' + result["inverter"]
+    if result == "{{}}":
+        return
+
+    inverter_id = pi_id + '-1'
     print("inverter ID: {0}".format(inverter_id))
     for model in result:
         print("Model: {0}".format(model))
@@ -230,6 +234,13 @@ def register_inverter(request):
         return HttpResponse("Successfully registered Inverter")
     else:
         return HttpResponse("The Pi you are tyring to register this inverter with does not exist.")
+
+@login_required
+def change_invert_name(request):
+    inverter_pk = request.POST['inverter']
+    inverter = Inverter.objects.filter(pk=inverter_pk)
+    inverter.custom_name = request.POST['newName']
+    inverter.save()
 
 @login_required
 def create_group(request):
