@@ -187,8 +187,11 @@ def recieve_data_to_save(request):
     pi_geohash = geohash.encode(float(lat), float(lon), 24)
     print("geohash: {0}".format(pi_geohash))
 
-    print("Values_dict: {0}".format(values_dict))
-    # save_data(values_dict, pi_geohash)
+
+    #values_dict = {'inverter': inverter, 'temperature': temperature, 'dcpower': dc_power, 'acpower': ac_power, 'status': status}
+    #values_dict = {'inverter': inverter, 'temperature': temperature}
+    #print("Values_dict: {0}".format(values_dict))
+    #save_data(values_dict, pi_geohash)
     return HttpResponse("Data Recieved Successfully")
 
 
