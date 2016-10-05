@@ -20,6 +20,10 @@ import re
 import time
 import json
 
+change_data = ["inputvoltage", "inputcurrent", "inputpower",
+"gridvoltage", "gridcurrent", "gridpower",
+"frequency", "conversionefficiency", "invertertemperature",
+"cumulatedenergy" ]
 
 def rabbitTest(request):
     result = add.delay(request)
@@ -181,17 +185,16 @@ def pull_data_from_inverter(request, inverter_pk):
 
 @csrf_exempt
 def recieve_data_to_save(request):
-    lat = request.GET.get('lat', -1)
-    lon = request.GET.get('lon', -1)
-    print("Lat {0} long: {1}".format(float(lat), float(lon)))
-    pi_geohash = geohash.encode(float(lat), float(lon), 24)
-    print("geohash: {0}".format(pi_geohash))
-
+    request = json.loads(request.body)
+    print request['inverter_id']
+    #print("Lat {0} long: {1}".format(float(lat), float(lon)))
+    #pi_geohash = geohash.encode(float(lat), float(lon), 24)
+    #print("geohash: {0}".format(pi_geohash))
 
     #values_dict = {'inverter': inverter, 'temperature': temperature, 'dcpower': dc_power, 'acpower': ac_power, 'status': status}
     #values_dict = {'inverter': inverter, 'temperature': temperature}
     #print("Values_dict: {0}".format(values_dict))
-    #save_data(values_dict, pi_geohash)
+    save_data(request, request['inverter_id'])
     return HttpResponse("Data Recieved Successfully")
 
 
@@ -199,22 +202,23 @@ def save_data(result, pi_id):
     if result == "{{}}":
         return
 
-    inverter_id = pi_id + '-1'
-    print("inverter ID: {0}".format(inverter_id))
+    inverter_id = result['inverter_id']
     for model in result:
         print("Model: {0}".format(model))
         #available_models=apps.get_app_config('ASUi3dea').get_models()
         if model != "inverter":
-            #try:
-            model_object = apps.get_model(app_label='ASUi3dea', model_name=model)
-            new_obj = model_object.objects.create(inverter_id=inverter_id) #create the model object
-            if model == "cumulatedenergy":
-                new_obj.set_data(result[model]["dailyenergy"], result[model]["weeklyenergy"], result[model]["monthlyenergy"], result[model]["yearlyenergy"], result[model]["totalenergy"])
-            else:
-                new_obj.set_data(result[model])
-            new_obj.save()
-            # except:
-            #     print("Either Pi or Inverter does not exist")
+            try:
+                model_object = apps.get_model(app_label='ASUi3dea', model_name=model)
+                print model_object
+                new_obj = model_object.objects.create(inverter_id=inverter_id) #create the model object
+
+                if model == "cumulatedenergy":
+                    new_obj.set_data(result[model]["dailyenergy"], result[model]["weeklyenergy"], result[model]["monthlyenergy"], result[model]["yearlyenergy"], result[model]["totalenergy"])
+                else:
+                    new_obj.set_data(result[model])
+                new_obj.save()
+            except:
+                print("i don't know what to do with that piece")
 
 
 def register_pi(request):
