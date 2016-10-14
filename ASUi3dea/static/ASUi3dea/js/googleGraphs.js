@@ -18,7 +18,9 @@ var lineOptions = {
      //   1: {curveType: 'function'}
      // },
      'width':550,
-     'height':500};
+     'height':500
+   };
+
 
 function drawAllGraphs(){
   drawPowerLine();
@@ -28,6 +30,7 @@ function drawAllGraphs(){
   drawEnergyChart();
   drawTemperatureChart();
 }
+
 
 function drawPowerLine() {
      var jsonData = $.ajax({
@@ -55,6 +58,7 @@ function drawPowerLine() {
      chart.draw(data, lineOptions);
 }
 
+
 function drawCurrentLine(){
   var jsonData = $.ajax({
       url: currentURL,
@@ -79,6 +83,7 @@ function drawCurrentLine(){
   var chart = new google.visualization.LineChart(document.getElementById('power-line'));
   chart.draw(data, lineOptions);
 }
+
 
 function drawVoltageLine(){
   var jsonData = $.ajax({
@@ -105,6 +110,7 @@ function drawVoltageLine(){
   chart.draw(data, lineOptions);
 }
 
+
 function drawEfficiencyArea(){
   var jsonData = $.ajax({
       url: efficiencyURL,
@@ -128,6 +134,7 @@ function drawEfficiencyArea(){
   var chart = new google.visualization.AreaChart(document.getElementById('efficiency-area'));
   chart.draw(data, lineOptions);
 }
+
 
 function drawEnergyChart(){
   var jsonData = $.ajax({
@@ -157,6 +164,7 @@ function drawEnergyChart(){
   chart.draw(data, tempOptions);
 }
 
+
 function drawTemperatureChart(){
   var jsonData = $.ajax({
       url: temperatureURL,
@@ -180,6 +188,7 @@ function drawTemperatureChart(){
   var chart = new google.visualization.LineChart(document.getElementById('temperature-chart'));
   chart.draw(data, lineOptions);
 }
+
 
 //'2016-08-04T23:46:01.828Z' -> '2016-08-04 23:46:01'
 function formatDate(date){

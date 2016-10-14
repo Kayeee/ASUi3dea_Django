@@ -3,13 +3,10 @@
   <!-- jquery-->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <!--bootstrap-->
-  <!-- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
   <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
   <!--static-->
   <link rel="stylesheet" type="text/css" href="{% static "ASUi3dea/css/detail.css" %}">
-  <!-- <link rel="stylesheet" type="text/css" href="{% static "ASUi3dea/css/bootstrap-switch.css" %}"> -->
-  <!-- <script src="{% static "ASUi3dea/js/bootstrap-switch.js" %}"></script> -->
+
 
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript"
@@ -45,93 +42,15 @@
         <h3 style="display: inline-block; color: white; vertical-align: middle;">Change name</h3>
         <!--update button-->
         {% url 'ASUi3dea:pull_data_from_inverter' inverter_pk=inverter.pk as update_url%}
-        <form action="{{update_url}}" style= "float: right; margin: 10px;">{% csrf_token %}
+        <!-- <form action="{{update_url}}" style= "float: right; margin: 10px;">{% csrf_token %}
             <input type="button" onclick="location.href='{{update_url}}';" class="action" value="Update" />
-        </form>
+        </form> -->
       </div>
       <p style="float: right; display: inline-block;"> Click <a href="/ASUi3dea/logout/">here</a> to logout. </p>
     </span>
   </header>
 
   <main>
-  <!--side panel-->
-  <!--Overview-->
-  <!--
-  <<div class="panel-group" style="z-index: 10px">
-    <div class="panel panel-default" id="navigator" >
-        <div class="panel-heading">
-        <h4 class="panel-title">
-          <a data-toggle="collapse" id="overview" href="#collapse1">Overview</a>
-
-
-          <script>
-          // $("#overview").click(function() {
-          //
-          //     // d3.json("{{overview_url}}", function(error, data) {
-          //     //   for (var attribute in data){
-          //     //     drawPowerGraph(data[attribute]);
-          //     //   }
-          //     // });
-          //   });
-          </script>
-        </h4>
-
-      </div>
-    </div>
-
-    Controls
-    <div class="panel panel-default" id="navigator" >
-        <div class="panel-heading">
-        <h4 class="panel-title">
-          <a data-toggle="collapse" href="#collapse2">Controls</a>
-        </h4>
-      </div>
-      <div id="collapse2" class="panel-collapse collapse">
-        <ul class="list-group nav nav-pills nav-stacked" style="padding: 5px;">
-          <li class="nav-tab"><a href="#">
-            <form id="controlFrm" action="/ASUi3dea/save_controls/" method="POST">{% csrf_token %}
-              <p>On/Off</p>
-              <input type="checkbox" name="on_off" value="True" id="on_off">
-            </form>
-          </a></li>
-          <li class="nav-tab"><a href="#">Control2</a></li>
-        </ul>
-        <div class="panel-footer">
-          <form action="ASUi3dea/save_controls" style="margin: 0px;">{% csrf_token %}
-              <input type="button" onclick="location.href='ASUi3dea/save_controls';" class="btn btn-primary" value="Save" />
-
-          </form>
-        </div>
-      </div>
-    </div>
-
-    Attributes
-    <div class="panel panel-default" id="navigator" >
-      <div class="panel-heading">
-        <h4 class="panel-title">
-          <a data-toggle="collapse" href="#collapse3">Attributes</a>
-        </h4>
-      </div>
-      <div id="collapse3" class="panel-collapse collapse">
-        <ul class="list-group nav nav-pills nav-stacked" style="padding: 5px;">
-
-          {% for attribute in attributes %}
-              {% url 'ASUi3dea:get_inverter_data' inverter_pk=inverter.pk data_set=attribute.0 as the_url %}
-              <li class="nav-tab"><a id="{{attribute.0}}" href="#section2"> {{ attribute.1.generic_name }}</a></li>
-              <li class="nav-tab"><a id="{{attribute.0}}" href="#section2"> {{ attribute.1.generic_name }}: {{attribute.1.get_data.1}}</a></li>
-              <script>
-              $("#{{attribute.0}}").click(function() {
-                  d3.json("{{the_url}}", function(error, data) {
-                    draw_line_graph(data);
-                  });
-                });
-              </script>
-          {% endfor %}
-        </ul>
-    </div>-->
-
-  </div>
-
   <div id="controls" class="left-sidebar">
     <ul>
       <li>Control 1 </li>

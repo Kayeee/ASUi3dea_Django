@@ -206,7 +206,7 @@ def save_data(result, pi_id):
     for model in result:
         print("Model: {0}".format(model))
         #available_models=apps.get_app_config('ASUi3dea').get_models()
-        if model != "inverter":
+        if model != "inverter_id":
             try:
                 model_object = apps.get_model(app_label='ASUi3dea', model_name=model)
                 print model_object
