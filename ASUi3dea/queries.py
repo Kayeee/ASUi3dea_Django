@@ -185,6 +185,7 @@ def pull_data_from_inverter(request, inverter_pk):
 
 @csrf_exempt
 def recieve_data_to_save(request):
+    print request.body
     request = json.loads(request.body)
     print request['inverter_id']
     #print("Lat {0} long: {1}".format(float(lat), float(lon)))
