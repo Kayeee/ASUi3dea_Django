@@ -183,8 +183,9 @@ def pull_data_from_inverter(request, inverter_pk):
         return HttpResponse("Inverter is offline. No data to retrieve")
     else:
         result = json.loads(result_json)
+        result['inverter_id'] = inverter_pk
         save_data(result, pi_id)
-        return HttpResponse('{"Data pull": "Success"}')
+        return HttpResponse('{"Datapull": "Success"}')
 
 @csrf_exempt
 def recieve_data_to_save(request):

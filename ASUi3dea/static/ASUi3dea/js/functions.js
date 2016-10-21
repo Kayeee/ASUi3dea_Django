@@ -5,7 +5,7 @@ $("#invert_name").focusout(function() {
 
      $.ajax({
         type: "POST",
-        url: "http://127.0.0.1:8000/ASUi3dea/" + inverter + "/change_invert_name/",
+        url: "http://52.87.223.187:8000/ASUi3dea/" + inverter + "/change_invert_name/",
         dataType: "json",
         data: {
           inverter: inverter,
@@ -29,7 +29,7 @@ $("#update-button").click(function() {
 
   $.ajax({
      type: "GET",
-     url: "http://127.0.0.1:8000/ASUi3dea/" + inverter + "/update/",
+     url: "http://52.87.223.187:8000/ASUi3dea/" + inverter + "/update/",
      dataType: "json",
      data: {
        csrfmiddlewaretoken: csrfToken
