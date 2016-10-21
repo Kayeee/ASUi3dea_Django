@@ -30,6 +30,7 @@
     var energyURL = "{{energy_query}}"
     var temperatureURL = "{{temperature_query}}"
     var inverter = "{{inverter}}";
+    var csrfToken = '{{csrf_token}}'
   </script>
 
 </head>
@@ -37,14 +38,14 @@
 <body>
   <header>
     <span style="width: 100%;">
-      <h1 style="display: inline-block; color: white; vertical-align: middle; margin: 0px 20px;" id="invert_name">{{ inverter.custom_name }}</h1>
+      <h1 contenteditable="true" style="display: inline-block; color: white; vertical-align: middle; margin: 0px 20px;" id="invert_name">{{ inverter.custom_name }}</h1>
       <div id="options-content">
-        <h3 style="display: inline-block; color: white; vertical-align: middle;">Change name</h3>
         <!--update button-->
-        {% url 'ASUi3dea:pull_data_from_inverter' inverter_pk=inverter.pk as update_url%}
-        <!-- <form action="{{update_url}}" style= "float: right; margin: 10px;">{% csrf_token %}
-            <input type="button" onclick="location.href='{{update_url}}';" class="action" value="Update" />
-        </form> -->
+        <!-- {% url 'ASUi3dea:pull_data_from_inverter' inverter_pk=inverter.pk as update_url%}
+        <form action="{{update_url}}" style= "float: right; margin: 10px;">{% csrf_token %} -->
+            <input id="update-button" type="button" class="action" value="Update" style="margin: 10px;"/>
+            
+        <!-- </form> -->
       </div>
       <p style="float: right; display: inline-block;"> Click <a href="/ASUi3dea/logout/">here</a> to logout. </p>
     </span>
@@ -69,4 +70,5 @@
   </main>
 
   <script src="{% static "ASUi3dea/js/googleGraphs.js" %}"/></script>
+  <script src="{% static "ASUi3dea/js/functions.js" %}"/></script>
 </body>

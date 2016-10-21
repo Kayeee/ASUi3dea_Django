@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from .models import *
 from celery import Celery
-from .tasks import *
+import ASUi3dea.tasks as tasks
 
 
 #from .formatter import formatter
@@ -26,7 +26,7 @@ change_data = ["inputvoltage", "inputcurrent", "inputpower",
 "cumulatedenergy" ]
 
 def rabbitTest(request):
-    result = add.delay(request)
+    result = tasks.add.delay(request)
     time.sleep(10)
     return HttpResponse(result.status)
 
@@ -148,6 +148,7 @@ def get_pi_data(request):
 
 #gest data from database
 def get_inverter_data(request, inverter_pk, data_set):
+
     inverter = Inverter.objects.get(pk=inverter_pk)
     data = getattr(inverter, data_set).all()
 
@@ -161,7 +162,7 @@ def get_inverter_data(request, inverter_pk, data_set):
 
 def pull_data_from_inverter(request, inverter_pk):
     pi_id = re.sub(r'-(.*)', '', inverter_pk)
-    getAll = getAll.apply_async(args=[0], queue='interface', routing_key='interface')
+    getAll = tasks.getAll.apply_async(args=[0], queue='interface', routing_key='interface')
     #result_json = createData()
     tries = 0
     while getAll.state != 'SUCCESS':
@@ -171,17 +172,19 @@ def pull_data_from_inverter(request, inverter_pk):
         if tries > 4:
             break
 
-    if tries < 4:
-        result_json = ""
+    if tries > 4:
+        result_json = '{}'
     else:
-        result_json = "{{" + getAll.get() + "}}"
-    #result_json = '{"inverter": "1", "temperature": 25}'
-    #print("Result Json: {0}".format(result_json.get()))
-    result = json.loads(result_json)
-    #result = json.loads(result_json)
-    print(result)
-    save_data(result, pi_id)
-    return HttpResponseRedirect('/ASUi3dea/' + inverter_pk)
+        result_json = "{" + getAll.get() + "}"
+
+    print(result_json)
+    if result_json == "{}":
+        print "here"
+        return HttpResponse("Inverter is offline. No data to retrieve")
+    else:
+        result = json.loads(result_json)
+        save_data(result, pi_id)
+        return HttpResponse('{"Data pull": "Success"}')
 
 @csrf_exempt
 def recieve_data_to_save(request):
@@ -244,11 +247,15 @@ def register_inverter(request):
         return HttpResponse("The Pi you are tyring to register this inverter with does not exist.")
 
 @login_required
-def change_invert_name(request):
-    inverter_pk = request.POST['inverter']
-    inverter = Inverter.objects.filter(pk=inverter_pk)
-    inverter.custom_name = request.POST['newName']
-    inverter.save()
+def change_invert_name(request, inverter_pk):
+    try:
+        inverter = Inverter.objects.get(pk=inverter_pk)
+        inverter.custom_name = request.POST['newName']
+        print inverter.custom_name
+        inverter.save()
+        return HttpResponse('{"Name change": "Success"}')
+    except:
+        return HttpResponse('{"response": "' + inverter_pk + ' does not exist"}')
 
 @login_required
 def create_group(request):
