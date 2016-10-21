@@ -44,7 +44,7 @@
         <!-- {% url 'ASUi3dea:pull_data_from_inverter' inverter_pk=inverter.pk as update_url%}
         <form action="{{update_url}}" style= "float: right; margin: 10px;">{% csrf_token %} -->
             <input id="update-button" type="button" class="action" value="Update" style="margin: 10px;"/>
-            
+
         <!-- </form> -->
       </div>
       <p style="float: right; display: inline-block;"> Click <a href="/ASUi3dea/logout/">here</a> to logout. </p>
@@ -54,9 +54,20 @@
   <main>
   <div id="controls" class="left-sidebar">
     <ul>
-      <li>Control 1 </li>
-      <li>Control 2 </li>
+      <li style="margin-bottom: 20px;">
+        <div>
+          <div class="control-label">Power Output</div>
+          <input type="range" style="width: 140px" multiple value="10,80" />
+        </div>
+      </li>
+      <li>
+        <div style="margin-bottom: 20px;">
+          <div class="control-label">Voltage Output</div>
+          <input type="range" style="width: 140px" multiple value="10,80" />
+        </div>
+      </li>
     </ul>
+    <button class="action" style="display: block; margin-left: auto; margin-right: auto;">Save</button>
   </div>
   <!--analytics containers-->
     <div class="chart-container">
