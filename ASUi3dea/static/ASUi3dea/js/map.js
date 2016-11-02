@@ -1,9 +1,9 @@
 $(document).ready(function() {
 
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - -Drop Down  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  for (model of available_models){
-    $("#data-types-dropdown").append('<li><a href="/ASUi3dea/authUser/choropleth/'+model+'"><span>'+model+'</span></a></li>')
-  }
+  // for (model of available_models){
+  //   $("#data-types-dropdown").append('<li><a href="/ASUi3dea/authUser/choropleth/'+model+'"><span>'+model+'</span></a></li>')
+  // }
 
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - -Set up Map  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   var selectedMarker;
@@ -129,7 +129,7 @@ $(document).ready(function() {
     //add to right list
     $.getJSON('/ASUi3dea/get_pi_data', {lat: m._latlng.lat, lng: m._latlng.lng}, function(data, jqXHR){
       for(inverter of data){
-        $("#inverters").append('<a href="/ASUi3dea/'+inverter.pk+'" class="list-group-item">'+inverter.fields.custom_name+'</a>')
+        $("#inverters").prepend('<a href="/ASUi3dea/'+inverter.pk+'" class="list-group-item">'+inverter.fields.custom_name+'</a>')
       }
     });
     markers.removeLayer(m)

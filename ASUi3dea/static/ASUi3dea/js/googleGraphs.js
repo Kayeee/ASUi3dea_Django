@@ -13,7 +13,12 @@ var lineOptions = {
           gridlines: {color: 'none'},
           minValue: 0
      },
-     'explorer': {},
+     explorer: {
+            actions: ['dragToZoom', 'rightClickToReset'],
+            axis: 'horizontal',
+            keepInBounds: true,
+            maxZoomIn: 4.0
+    },
      // 'series': {
      //   1: {curveType: 'function'}
      // },

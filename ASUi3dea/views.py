@@ -100,3 +100,7 @@ def detail(request, inverter_pk):
     except Inverter.DoesNotExist:
         raise Http404("Inverter does not exist")
     return render(request, 'ASUi3dea/detail.html', {'inverter': inverter, 'attributes': attributes})
+
+@login_required
+def registerDevice(request):
+    return render(request, 'ASUi3dea/registerDevice.html')

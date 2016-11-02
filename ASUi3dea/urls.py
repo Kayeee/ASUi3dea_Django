@@ -17,7 +17,9 @@ urlpatterns = [
     url(r'^authUser/$', views.loggedin, name='loggedin' ),
     url(r'^authUser/choropleth/(?P<data_type>.*)/$', views.choropleth_data, name='choropleth_data' ),
     url(r'^basicUser/$', views.loggedin_basic, name='loggedin_basic'),
+    url(r'^registerDevice/$', views.registerDevice, name='registerDevice'),
     url(r'^(?P<inverter_pk>[a-z0-9]+-[0-9]+)/$', views.detail, name='detail'),
+
 
     #queries.py
     url(r'^save_controls/$', queries.save_controls, name='save_controls' ),
